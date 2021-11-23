@@ -1,0 +1,322 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="cm.intelso.dev.travelezi.SearchBusLinesFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/component_bg"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_search_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_blue_bg_top"
+                android:foreground="@android:drawable/btn_star"
+                android:foregroundGravity="left|center_vertical"
+                android:gravity="start|center_vertical"
+                android:paddingStart="40dp"
+                android:text="@string/search_param_title"
+                tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck"
+                tools:targetApi="m" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/component_gray_bg"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:orientation="vertical"
+                        android:weightSum="2">
+
+                        <ImageView
+                            android:id="@+id/imageView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/one_way_travel"
+                            android:src="@mipmap/dep_dest_grey"
+                            tools:ignore="ImageContrastCheck" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="vertical"
+                        android:weightSum="2">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/tv_departure1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:hint="@string/departure_name"
+                            android:minHeight="48dp"
+                            android:singleLine="true"
+                            android:textIsSelectable="true"
+                            android:textSize="14sp"
+                            tools:ignore="SpeakableTextPresentCheck,SpeakableTextPresentCheck,TextContrastCheck" />
+
+                        <AutoCompleteTextView
+                            android:id="@+id/tv_arrival1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:hint="@string/arrival_name"
+                            android:minHeight="48dp"
+                            android:singleLine="true"
+                            android:textIsSelectable="true"
+                            android:textSize="14sp"
+                            tools:ignore="SpeakableTextPresentCheck,TextContrastCheck" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/component_gray_bg"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/btn_choose_line"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:foregroundGravity="left|center_vertical"
+                        android:gravity="center|start|end"
+                        android:hint="@string/line_name"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:textSize="14sp"
+                        tools:ignore="TouchTargetSizeCheck,TouchTargetSizeCheck,TextContrastCheck,TextContrastCheck" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/component_gray_bg"
+                    android:orientation="vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/tv_departure_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/departure_label"
+                        tools:ignore="TextContrastCheck" />
+
+                    <androidx.appcompat.widget.AppCompatSpinner
+                        android:id="@+id/tv_departure"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:minHeight="48dp"
+                        tools:ignore="SpeakableTextPresentCheck" />
+
+                    <View
+                        android:id="@+id/divider2"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/accent" />
+
+                    <TextView
+                        android:id="@+id/tv_arrival_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/arrival_label"
+                        tools:ignore="TextContrastCheck" />
+
+                    <Spinner
+                        android:id="@+id/tv_arrival"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:minHeight="48dp"
+                        tools:ignore="SpeakableTextPresentCheck" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_or"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/or"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/component_gray_bg"
+                    android:orientation="vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/tv_stop_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/line_label"
+                        tools:ignore="TextContrastCheck" />
+
+                    <androidx.appcompat.widget.AppCompatSpinner
+                        android:id="@+id/tv_start_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:foregroundGravity="left|center_vertical"
+                        android:gravity="center|start|end"
+                        tools:ignore="SpeakableTextPresentCheck" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/btn_gray_bg_buttom"
+                android:gravity="center|end"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_reset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center|start"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/btn_bg"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/reset"
+                    android:textAllCaps="false"
+                    tools:ignore="TextContrastCheck,TouchTargetSizeCheck,DuplicateSpeakableTextCheck" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/btn_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center|end"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/btn_bg"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/search"
+                    android:textAllCaps="false"
+                    tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:background="@drawable/component_bg"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_search_result_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_blue_bg_top"
+                android:foreground="@android:drawable/btn_star"
+                android:foregroundGravity="left|center_vertical"
+                android:gravity="start|center_vertical"
+                android:paddingStart="40dp"
+                android:text="@string/search_result_title"
+                tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck"
+                tools:targetApi="m" />
+
+            <TextView
+                android:id="@+id/tv_not_found"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:minHeight="100dp"
+                android:text="@string/no_line" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/stops_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="50dp"
+                android:background="@drawable/component_bg">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

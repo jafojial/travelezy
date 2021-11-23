@@ -1,0 +1,177 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cm.intelso.dev.travelezi.MainFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="60dp">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/component_bg"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btn_fav_lines_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_blue_bg_top"
+                    android:foreground="@android:drawable/btn_star"
+                    android:foregroundGravity="left|center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="40dp"
+                    android:paddingLeft="40dp"
+                    android:text="@string/fav_lines_title"
+                    tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck"
+                    tools:targetApi="m" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/stops_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/component_bg">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/btn_gray_bg_buttom"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_fav_lines_more"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35dp"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/btn_bg"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/fav_lines_more"
+                        android:textAllCaps="false"
+                        tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/component_bg"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btn_fav_stops_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_blue_bg_top"
+                    android:foreground="@android:drawable/btn_star"
+                    android:foregroundGravity="left|center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="40dp"
+                    android:paddingLeft="40dp"
+                    android:text="@string/fav_stops_title"
+                    tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck"
+                    tools:targetApi="m" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fav_stops_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/component_bg">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/btn_gray_bg_buttom"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_fav_stops_more"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35dp"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/btn_bg"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/fav_stops_more"
+                        android:textAllCaps="false"
+                        tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/component_bg"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btn_fav_rides_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_blue_bg_top"
+                    android:foreground="@android:drawable/btn_star"
+                    android:foregroundGravity="left|center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="40dp"
+                    android:paddingLeft="40dp"
+                    android:text="@string/fav_rides_title"
+                    tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck"
+                    tools:targetApi="m" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fav_rides_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/component_bg">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/btn_gray_bg_buttom"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_fav_rides_more"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35dp"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/btn_bg"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/fav_rides_more"
+                        android:textAllCaps="false"
+                        tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

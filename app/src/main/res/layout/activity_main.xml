@@ -1,0 +1,86 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/mob_app_bg"
+    tools:context="cm.intelso.dev.travelezi.MainActivity">
+
+    <!-- mian content frame -->
+    <FrameLayout
+        android:id="@+id/app_content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/app_content_frame"
+        android:background="@color/primary">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:stretchColumns="*">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:weightSum="1">
+
+                <Button
+                    android:id="@+id/btn_home"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_home"
+                    android:textColor="@color/primary_text"
+                    tools:ignore="TextContrastCheck" />
+
+                <Button
+                    android:id="@+id/btn_lines"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_lines"
+                    android:textColor="@color/primary_text"
+                    tools:ignore="TextContrastCheck" />
+
+                <Button
+                    android:id="@+id/btn_stops"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/btn_stops"
+                    android:textColor="@color/primary_text"
+                    tools:ignore="TextContrastCheck" />
+
+                <Button
+                    android:id="@+id/btn_rides"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/btn_rides"
+                    android:textColor="@color/primary_text"
+                    tools:ignore="TextContrastCheck" />
+
+                <Button
+                    android:id="@+id/button5"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/btn_more"
+                    android:textColor="@color/primary_text"
+                    tools:ignore="TextContrastCheck" />
+            </TableRow>
+
+        </TableLayout>
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+</RelativeLayout>

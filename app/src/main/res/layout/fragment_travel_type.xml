@@ -1,0 +1,75 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cm.intelso.dev.travelezi.TravelTypeFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/gray_color"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_margin="25dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/tv_travel_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingBottom="20dp"
+                    android:text="@string/travel_type"
+                    android:textColor="@color/primary_text"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical"
+                    android:weightSum="2">
+
+                    <Button
+                        android:id="@+id/button_one_way_ticket"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dp"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_bg"
+                        android:text="@string/one_way_ticket"
+                        android:textColor="@color/primary_text"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/button_two_way_ticket"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dp"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_bg"
+                        android:text="@string/two_way_ticket"
+                        android:textColor="@color/primary_text"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</FrameLayout>
