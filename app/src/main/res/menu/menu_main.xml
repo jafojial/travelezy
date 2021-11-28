@@ -3,10 +3,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="cm.intelso.dev.travelezi.MainActivity">
 
+    <item
+        android:id="@+id/action_stop_hist"
+        android:orderInCategory="100"
+        android:title="@string/stop_history"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_ride_hist"
+        android:orderInCategory="100"
+        android:title="@string/ride_history"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_fav_stops"
+        android:orderInCategory="100"
+        android:title="@string/fav_stops_title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_fav_rides"
+        android:orderInCategory="100"
+        android:title="@string/fav_rides_title"
+        app:showAsAction="never" />
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
 
     <item android:id="@+id/action_home" android:title="@string/action_home"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item
+        android:id="@+id/action_sign"
+        android:orderInCategory="100"
+        android:title="@string/sign_out"
+        app:showAsAction="never" />
 
 </menu>

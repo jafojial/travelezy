@@ -256,12 +256,12 @@ public class SearchBusStopsFragment extends Fragment {
 
     private  ArrayList<StopItem> getListStops() {
         ArrayList<StopItem> list = new ArrayList<StopItem>();
-        StopItem stop0 = new StopItem("", "Select one item",  "");
-        StopItem stop1 = new StopItem("CCW", "Carrefour CamWater",  "087, 076, 046");
-        StopItem stop2 = new StopItem("PTJ", "Pont Joss",  "076, 087, 039, 054");
-        StopItem stop3 = new StopItem("CLC", "Carrefour Leclerc", "012, 076, 087, 064");
-        StopItem stop4 = new StopItem("MDF", "Marché des fleurs",  "076, 087, 019, 058");
-        StopItem stop5 = new StopItem("CSO", "Carrefour Soudanaise", "012, 046, 087, 046");
+        StopItem stop0 = new StopItem("", "Select one item",  "", 0d, 0d);
+        StopItem stop1 = new StopItem("CCW", "Carrefour CamWater",  "087, 076, 046", 4.031871499999999,9.690278900000001);
+        StopItem stop2 = new StopItem("PTJ", "Pont Joss",  "076, 087, 039, 054", 4.0430068,9.6906967);
+        StopItem stop3 = new StopItem("CLC", "Carrefour Leclerc", "012, 076, 087, 064",4.0330068,9.690278900000001);
+        StopItem stop4 = new StopItem("MDF", "Marché des fleurs",  "076, 087, 019, 058", 4.02535,9.692945500000002);
+        StopItem stop5 = new StopItem("CSO", "Carrefour Soudanaise", "012, 046, 087, 046", 4.0480242,9.6942605);
 
 
         //list.add(stop0);

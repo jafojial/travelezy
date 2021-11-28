@@ -28,14 +28,14 @@
     <string name="line_code">Code de la ligne</string>
     <string name="stop_list">Liste des codes des arrêts</string>
     <string name="stops">Arrêts</string>
-    <string name="fav_stops_title">Arrêts favories</string>
+    <string name="fav_stops_title">Arrêts favoris</string>
     <string name="fav_stops_more">Voir plus</string>
     <string name="stop_name">Nom de l\'arrêt</string>
     <string name="stop_code">Code de l\'arrêt</string>
     <string name="line_list">Liste des codes des lignes</string>
     <string name="lines">Lignes</string>
     <string name="fav_rides_more">Voir plus</string>
-    <string name="fav_rides_title">Derniers trajets</string>
+    <string name="fav_rides_title">Trajets favoris</string>
     <string name="search">Rechercher</string>
     <string name="reset">Effacer</string>
     <string name="or">Ou</string>
@@ -55,4 +55,15 @@
     <string name="end_date">Date de fin</string>
     <string name="next_bus_waiting_msg">Prochain bus dans environ 15 minutes</string>
     <string name="take_bus">Choisir</string>
+    <string name="stop_history">Historique des arrêts</string>
+    <string name="ride_history">Historique des trajets</string>
+    <string name="sign_in">Connexion</string>
+    <string name="sign_out">Déconnexion</string>
+    <string name="last_rides_title">Derniers trajets</string>
+    <string name="last_rides_more">Voir plus</string>
+    <string name="current_pos">Position actuelle</string>
+    <string name="next_stop">Prochain arrêt</string>
+    <string name="ok">Ok</string>
+    <string name="select_dep_first">Sélectionnez d\'abord la position actuelle</string>
+    <string name="select_arr_first">Sélectionnez d\'abord le prochain arrêt</string>
 </resources>

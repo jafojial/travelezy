@@ -1,22 +1,20 @@
 package cm.intelso.dev.travelezi.dto;
 
-public class StopItem {
+public class Bus {
 
     private String code;
-    private String name;
-    private String lines;
+    private String immat;
     private double rtLat;
     private double rtLng;
 
-    public StopItem() {
+    public Bus() {
     }
 
-    public StopItem(String code, String name, String lines, double rtLat, double rtLng) {
+    public Bus(String code, double rtLat, double rtLng, String immat) {
         this.code = code;
-        this.name = name;
-        this.lines = lines;
         this.rtLat = rtLat;
         this.rtLng = rtLng;
+        this.immat = immat;
     }
 
     public String getCode() {
@@ -25,22 +23,6 @@ public class StopItem {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLines() {
-        return lines;
-    }
-
-    public void setLines(String lines) {
-        this.lines = lines;
     }
 
     public double getRtLat() {
@@ -59,17 +41,26 @@ public class StopItem {
         this.rtLng = rtLng;
     }
 
+    public String getImmat() {
+        return immat;
+    }
+
+    public void setImmat(String immat) {
+        this.immat = immat;
+    }
+
     /*@Override
     public String toString() {
         return "LineItem{" +
                 "code='" + code + '\'' +
-                ", name='" + name + '\'' +
-                ", lines='" + lines + '\'' +
+                ", departure='" + departure + '\'' +
+                ", arrival='" + arrival + '\'' +
+                ", stops='" + stops + '\'' +
                 '}';
     }*/
 
     @Override
     public String toString() {
-        return name;
+        return code;
     }
 }

@@ -44,7 +44,9 @@
     <string name="stop_code">Stop code</string>
     <string name="line_list">Line list code</string>
     <string name="lines">Lines</string>
-    <string name="fav_rides_title">Latest rides</string>
+    <string name="last_rides_title">Latest rides</string>
+    <string name="last_rides_more">Search more</string>
+    <string name="fav_rides_title">Starred rides</string>
     <string name="fav_rides_more">Search more</string>
     <string name="departure_hour" translatable="false">00:00</string>
     <string name="arrival_hour" translatable="false">00:00</string>
@@ -69,4 +71,13 @@
     <string name="google_maps_key" translatable="false">AIzaSyDo1_gCsqyN0sul5SsJk-lsJBEVMQLpPF4</string>
     <string name="take_bus">Choose</string>
     <string name="next_bus_waiting_msg">Next bus in about 15 minutes</string>
+    <string name="stop_history">Stops history</string>
+    <string name="ride_history">Rides history</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_out">Sign out</string>
+    <string name="current_pos">Current position</string>
+    <string name="next_stop">Next stop</string>
+    <string name="ok">Ok</string>
+    <string name="select_dep_first">Select the current position first</string>
+    <string name="select_arr_first">Select the next stop first</string>
 </resources>

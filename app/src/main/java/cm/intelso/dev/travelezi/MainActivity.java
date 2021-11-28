@@ -15,8 +15,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.OnFragmentInteractionListener, SearchBusLinesFragment.OnFragmentInteractionListener
         , SearchBusStopsFragment.OnFragmentInteractionListener, SearchBusRidesFragment.OnFragmentInteractionListener, BusLineFragment.OnFragmentInteractionListener
-        , BusStopFragment.OnFragmentInteractionListener, TwoWayBusFragment.OnFragmentInteractionListener, PassengerInfosFragment.OnFragmentInteractionListener
-    , ConfirmOperationFragment.OnFragmentInteractionListener
+        , BusStopFragment.OnFragmentInteractionListener, NearBusFragment.OnFragmentInteractionListener, FavStopFragment.OnFragmentInteractionListener
+    , FavRideFragment.OnFragmentInteractionListener, HistRideFragment.OnFragmentInteractionListener, HistStopFragment.OnFragmentInteractionListener
 {
 
     private long pressedTime;
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFr
 
         if (savedInstanceState == null) {
 //            switchFragment(new TravelTypeFragment());
-            switchFragment(new MainFragment());
+            switchFragment(new NearBusFragment());
         }
     }
 
@@ -68,7 +68,21 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFr
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_home) {
-            switchFragment(new MainFragment());
+            switchFragment(new NearBusFragment());
+            return true;
+        } else if (id == R.id.action_fav_rides) {
+            switchFragment(new FavRideFragment());
+            return true;
+        } else if (id == R.id.action_fav_stops) {
+            switchFragment(new FavStopFragment());
+            return true;
+        } else if (id == R.id.action_ride_hist) {
+            switchFragment(new HistRideFragment());
+            return true;
+        } else if (id == R.id.action_stop_hist) {
+            switchFragment(new HistStopFragment());
+            return true;
+        } else if (id == R.id.action_sign) {
             return true;
         }
 
