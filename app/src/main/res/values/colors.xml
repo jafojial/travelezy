@@ -15,5 +15,7 @@
     <color name="light_gray_color">#E8E8E8</color>
     <color name="red_color">#EA151D</color>
     <color name="green_color">#58C440</color>
+    <color name="sct_primary">#3332CC</color>
+    <color name="sct_secondary">#58C440</color>
 
 </resources>

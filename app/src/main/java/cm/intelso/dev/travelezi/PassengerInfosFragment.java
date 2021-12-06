@@ -32,7 +32,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import cm.intelso.dev.travelezi.R;
 import cm.intelso.dev.travelezi.json.JsonController;
 import cm.intelso.dev.travelezi.utils.DataUtils;
 
@@ -160,7 +159,7 @@ public class PassengerInfosFragment extends Fragment {
         nomPassager = (EditText) view.findViewById(R.id.name);
         cniPassager = (EditText) view.findViewById(R.id.cni_number);
         numeroTelephonePassager = (EditText) view.findViewById(R.id.phone_number);
-        emailPassager = (EditText) view.findViewById(R.id.email);
+        emailPassager = (EditText) view.findViewById(R.id.tv_email);
 
         bagages = (Spinner) view.findViewById(R.id.bagages);
         adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, nbreBagages);

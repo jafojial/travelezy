@@ -66,4 +66,7 @@
     <string name="ok">Ok</string>
     <string name="select_dep_first">Sélectionnez d\'abord la position actuelle</string>
     <string name="select_arr_first">Sélectionnez d\'abord le prochain arrêt</string>
+    <string name="bus">Bus</string>
+    <string name="enter_email">Enter your Email</string>
+    <string name="enter_pwd">Enter your Password</string>
 </resources>

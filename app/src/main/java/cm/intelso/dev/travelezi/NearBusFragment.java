@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -59,10 +61,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import cm.intelso.dev.travelezi.apiclient.RetrofitClient;
 import cm.intelso.dev.travelezi.dto.Bus;
 import cm.intelso.dev.travelezi.dto.LineItem;
+import cm.intelso.dev.travelezi.dto.POI;
 import cm.intelso.dev.travelezi.dto.StopItem;
 import cm.intelso.dev.travelezi.json.JsonController;
+import cm.intelso.dev.travelezi.utils.DataUtils;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 
 /**
@@ -165,9 +172,7 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
         final View view = inflater.inflate(R.layout.fragment_near_bus, container, false);
         //getDialog().setTitle(getResources().getString(R.string.add_account_title));
 
-        pDialog = new ProgressDialog(getContext());
-        pDialog.setMessage(getString(R.string.wait));
-        pDialog.setCancelable(false);
+        pDialog = DataUtils.createProgressDialog(getContext(), getContext().getString(R.string.wait), Boolean.FALSE);
 
         wbInfo = (TextView) view.findViewById(R.id.tv_info_wb);
         abInfo = (TextView)view.findViewById(R.id.tv_info_ab);
@@ -677,23 +682,56 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private  ArrayList<StopItem> getListDepartureStops() {
-        ArrayList<StopItem> list = new ArrayList<StopItem>();
-        StopItem stop0 = new StopItem("", getResources().getString(R.string.current_pos),  "", 0d, 0d);
-        StopItem stop1 = new StopItem("CCW", "Carrefour CamWater",  "087, 076, 046", 4.031871499999999,9.690278900000001);
-        StopItem stop2 = new StopItem("PTJ", "Pont Joss",  "076, 087, 039, 054", 4.0430068,9.6906967);
-        StopItem stop3 = new StopItem("CLC", "Carrefour Leclerc", "012, 076, 087, 064",4.0330068,9.690278900000001);
-        StopItem stop4 = new StopItem("MDF", "Marché des fleurs",  "076, 087, 019, 058", 4.02535,9.692945500000002);
-        StopItem stop5 = new StopItem("CSO", "Carrefour Soudanaise", "012, 046, 087, 046", 4.0480242,9.6942605);
+        DataUtils.showProgressDialog(pDialog);
 
-        list.add(stop0);
-        list.add(stop1);
-        list.add(stop2);
-        list.add(stop3);
-        list.add(stop4);
-        list.add(stop5);
+        ArrayList<StopItem> list = new ArrayList<StopItem>();
+        list.add(new StopItem("", getResources().getString(R.string.current_pos),  "", 0d, 0d));
+
+        Call<List<POI>> call = RetrofitClient.getInstance().getMyApi().findStops();
+        call.enqueue(new Callback<List<POI>>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(Call<List<POI>> call, retrofit2.Response<List<POI>> response) {
+
+                Log.i(TAG, "URL : " + call.request().url().toString());
+                List<POI> pois = response.body();
+                if (pois != null && !pois.isEmpty()) {
+                    Log.i(TAG, "POI SIZE : " + pois.size());
+                    String roles = null;
+                    for (POI poi : pois) {
+                        // if(poi.getType().equals("STOP")
+                        list.add(new StopItem(poi.getCode(), poi.getName(),  "", Double.valueOf(poi.getLatitude()), Double.valueOf(poi.getLongitude())));
+                    }
+                    // hide the progress bar
+//                    progressbar.setVisibility(View.GONE);
+
+                }
+                else {
+
+                    // sign-in failed
+                    Toast.makeText(getContext(), "Login failed!!", Toast.LENGTH_LONG).show();
+
+                    // hide the progress bar
+//                    progressbar.setVisibility(View.GONE);
+                }
+                DataUtils.hideProgressDialog(pDialog);
+
+            }
+
+            @Override
+            public void onFailure(Call<List<POI>> call, Throwable throwable) {
+                Log.i(TAG, throwable.getMessage());
+                Toast.makeText(getContext(), "An error has occured when fetch url " + call.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                // hide the progress bar
+//                progressbar.setVisibility(View.GONE);
+                DataUtils.hideProgressDialog(pDialog);
+            }
+
+        });
 
         return list;
     }
+
 
     private  ArrayList<StopItem> getListArrivalStops() {
         ArrayList<StopItem> list = new ArrayList<StopItem>();
