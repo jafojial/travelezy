@@ -67,6 +67,17 @@
     <string name="select_dep_first">Sélectionnez d\'abord la position actuelle</string>
     <string name="select_arr_first">Sélectionnez d\'abord le prochain arrêt</string>
     <string name="bus">Bus</string>
-    <string name="enter_email">Enter your Email</string>
-    <string name="enter_pwd">Enter your Password</string>
+    <string name="enter_email">Saisissez votre email</string>
+    <string name="enter_pwd">Saisissez votre mot de passe</string>
+    <string name="title_activity_login">Connexion</string>
+    <string name="prompt_email">email</string>
+    <string name="prompt_password">Mot de passe</string>
+    <string name="action_sign_in">Se connecter ou s\'enregistrer</string>
+    <string name="action_sign_in_short">Se connecter</string>
+    <string name="welcome">Bienvenue !</string>
+    <string name="invalid_username">Nom d\'utilisateur invalide</string>
+    <string name="invalid_password">Le mot de passe doit avoir plus de 5 caractères</string>
+    <string name="login_failed">Connexion échouée</string>
+    <string name="next">Suivant</string>
+    <string name="previous">Précédent</string>
 </resources>

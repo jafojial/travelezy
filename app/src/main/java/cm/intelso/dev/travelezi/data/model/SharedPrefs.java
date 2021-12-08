@@ -17,6 +17,8 @@ public class SharedPrefs {
     public final String PREFS_APP_MOMO_PARAMETERS_KEY = "__MOMO_PARAMETERS__";
     public final String PREFS_APP_MODE_KEY = "__MODE__" ;
     public final String PREFS_USER_TOKEN_KEY = "__TOKEN__" ;
+    public final String PREFS_USER_CURRENT_STOP_KEY = "__CURRENT_STOP__" ;
+    public final String PREFS_USER_NEXT_STOP_KEY = "__NEXT_STOP__" ;
     public final String PREFS_AGENT_ID_KEY = "__AGENT_ID__" ;
     public final String PREFS_AGENT_LOGIN_KEY = "__AGENT_LOGIN__" ;
     public final String PREFS_AGENT_COMPLETE_NAME_KEY = "__AGENT_COMPLETE_NAME__" ;

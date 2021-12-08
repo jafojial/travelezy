@@ -18,9 +18,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
 import java.util.Objects;
 
 import cm.intelso.dev.travelezi.apiclient.RetrofitClient;
+import cm.intelso.dev.travelezi.data.model.SharedPrefs;
 import cm.intelso.dev.travelezi.dto.AuthToken;
 import cm.intelso.dev.travelezi.dto.User;
 import cm.intelso.dev.travelezi.utils.DataUtils;
@@ -37,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText tvEmail, tvPassword;
     private Button btnLogin;
     private ProgressBar progressbar;
+    private SharedPrefs settings;
 
     // Progress dialog
     private ProgressDialog pDialog;
@@ -53,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
 //        mAuth = FirebaseAuth.getInstance();
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        settings = new SharedPrefs();
 
         pDialog = DataUtils.createProgressDialog(LoginActivity.this, getApplicationContext().getString(R.string.wait), Boolean.FALSE);
 
@@ -105,8 +109,29 @@ public class LoginActivity extends AppCompatActivity {
         getAuthToken(email, password);
     }
 
+
     private void getAuthToken(String username, String pwd) {
-        Call<AuthToken> call = RetrofitClient.getInstance().getMyApi().requestAuthToken(new User(username, pwd));
+
+        String tkn = settings.getStringValue(getApplicationContext(), settings.PREFS_USER_TOKEN_KEY);
+        if(tkn != null && !tkn.isEmpty()){
+            try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    Jws<Claims> jws = Jwts.parserBuilder().setSigningKey(DataUtils.getPublicKey()).build().parseClaimsJws(tkn);
+                    if(jws.getBody().getExpiration().after(new Date())){
+                        // hide the progress bar
+//                        progressbar.setVisibility(View.GONE);
+                        DataUtils.hideProgressDialog(pDialog);
+                        String roles = Objects.requireNonNull(jws.getBody().get("roles")).toString();
+                        startActivityByRole(roles);
+                    }
+                }
+            } catch (JwtException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+                //don't trust the JWT!
+                Log.i(TAG, "JWT TOKEN EXCEPTION : " + e.getMessage());
+            }
+        }
+
+        Call<AuthToken> call = RetrofitClient.getInstance(null).getMyApi().requestAuthToken(new User(username, pwd));
         call.enqueue(new Callback<AuthToken>() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -136,18 +161,10 @@ public class LoginActivity extends AppCompatActivity {
 //                    progressbar.setVisibility(View.GONE);
                     DataUtils.hideProgressDialog(pDialog);
 
+                    settings.save(getApplicationContext(), settings.PREFS_USER_TOKEN_KEY, authToken.getToken());
+
                     // if sign-in is successful
-                    if(roles.contains("ROLE_DRIVER")){
-                        // Driver
-                        // Intent to driver home activity
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                    } else if(roles.equals("[ROLE_USER]")){
-                        // Passenger
-                        // Intent to passenger home activity
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                    }
+                    startActivityByRole(roles);
                 }
                 else {
 
@@ -171,6 +188,20 @@ public class LoginActivity extends AppCompatActivity {
             }
 
         });
+    }
+
+    private void startActivityByRole(String roles) {
+        if(roles.contains("ROLE_DRIVER")){
+            // Driver
+            // Intent to driver home activity
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        } else if(roles.equals("[ROLE_USER]")){
+            // Passenger
+            // Intent to passenger home activity
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
     }
 
 }

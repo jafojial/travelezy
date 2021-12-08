@@ -62,10 +62,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cm.intelso.dev.travelezi.apiclient.RetrofitClient;
+import cm.intelso.dev.travelezi.data.model.SharedPrefs;
 import cm.intelso.dev.travelezi.dto.Bus;
+import cm.intelso.dev.travelezi.dto.Line;
 import cm.intelso.dev.travelezi.dto.LineItem;
 import cm.intelso.dev.travelezi.dto.POI;
 import cm.intelso.dev.travelezi.dto.StopItem;
+import cm.intelso.dev.travelezi.dto.WaitingDetail;
 import cm.intelso.dev.travelezi.json.JsonController;
 import cm.intelso.dev.travelezi.utils.DataUtils;
 import retrofit2.Call;
@@ -89,6 +92,8 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private SharedPrefs settings;
+    private String token;
 
     private GoogleMap mMap;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -110,6 +115,7 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
 
     ArrayList<LineItem> linesDetails;
     ArrayList<StopItem> departureStopsDetails, arrivalStopsDetails;
+//    List<Bus> busList;
 
     // Progress dialog
     private ProgressDialog pDialog;
@@ -173,6 +179,8 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
         //getDialog().setTitle(getResources().getString(R.string.add_account_title));
 
         pDialog = DataUtils.createProgressDialog(getContext(), getContext().getString(R.string.wait), Boolean.FALSE);
+        settings = new SharedPrefs();
+        token = settings.getStringValue(getContext(), settings.PREFS_USER_TOKEN_KEY);
 
         wbInfo = (TextView) view.findViewById(R.id.tv_info_wb);
         abInfo = (TextView)view.findViewById(R.id.tv_info_ab);
@@ -194,23 +202,8 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
         pInfoLayout.setVisibility(View.GONE);
 
         //makeJsonArrayRequest(url);
-        linesDetails = getListLines();
         departureStopsDetails = getListDepartureStops();
-        arrivalStopsDetails = getListArrivalStops();
-
-        depStopAdapter = new ArrayAdapter<StopItem>(getContext(),
-                android.R.layout.simple_spinner_item,
-                departureStopsDetails);
-        arrStopAdater = new ArrayAdapter<StopItem>(getContext(),
-                android.R.layout.simple_spinner_item,
-                arrivalStopsDetails);
-
-        // Layout for All ROWs of Spinner.  (Optional for ArrayAdapter).
-        depStopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        arrStopAdater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        this.departure.setAdapter(depStopAdapter);
-        this.arrival.setAdapter(arrStopAdater);
+        populateDepStopDropDown(departureStopsDetails);
 
         // When user select a List-Item.
         this.departure.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -249,6 +242,9 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
                     Toast.makeText(getContext(), getResources().getString(R.string.select_arr_first), Toast.LENGTH_LONG).show();
                     return;
                 }
+
+                List<Bus> busList = getLineNextBus(selDeparture.getCode(), selArrival.getCode());
+
                 Bundle bundle=new Bundle();
                 bundle.putString("departureID", selDeparture.getCode());
                 bundle.putString("arrivalID", selArrival.getCode());
@@ -261,17 +257,17 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.app_content_frame, newContent).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .addToBackStack(null).commit();*/
-
-                mapLine.setVisibility(View.VISIBLE);
-                pInfoLayout.setVisibility(View.VISIBLE);
-                infoLayout.setVisibility(View.GONE);
-                actionLayout.setVisibility(View.VISIBLE);
-
-                if(mMap != null){
-                    mMap.clear();
-
-                    displayMap(mMap);
-                }
+//
+//                mapLine.setVisibility(View.VISIBLE);
+//                pInfoLayout.setVisibility(View.VISIBLE);
+//                infoLayout.setVisibility(View.GONE);
+//                actionLayout.setVisibility(View.VISIBLE);
+//
+//                if(mMap != null){
+//                    mMap.clear();
+//
+//                    displayMap(mMap, busList);
+//                }
 
                 final ScheduledExecutorService waitingBusTaskExecutor = Executors.newScheduledThreadPool(5);
                 final AtomicInteger count = new AtomicInteger(10);
@@ -404,12 +400,25 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
         Adapter adapter = adapterView.getAdapter();
         selDeparture = (StopItem) adapter.getItem(position);
 
+        if(!selDeparture.getCode().isEmpty()) {
+            settings.save(getContext(), settings.PREFS_USER_CURRENT_STOP_KEY, selDeparture.getCode());
+            arrivalStopsDetails = getListArrivalStops();
+        } else{
+            arrivalStopsDetails = initListArrivalStops();
+        }
+        populateArrStopDropDown(arrivalStopsDetails);
+
 //        Toast.makeText(getContext(), "Selected departure StopItem: " + selDeparture.getName() ,Toast.LENGTH_SHORT).show();
     }
+
 
     private void onArrivalStopItemSelectedHandler(AdapterView<?> adapterView, View view, int position, long id) {
         Adapter adapter = adapterView.getAdapter();
         selArrival = (StopItem) adapter.getItem(position);
+
+        if(!selArrival.getCode().isEmpty()) {
+            settings.save(getContext(), settings.PREFS_USER_NEXT_STOP_KEY, selArrival.getCode());
+        }
 
 //        Toast.makeText(getContext(), "Selected arrival StopItem: " + selArrival.getName() ,Toast.LENGTH_SHORT).show();
     }
@@ -428,123 +437,133 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         Log.i(TAG, "On method onMapReady");
         mMap = googleMap;
-        displayMap(mMap);
+        displayMap(mMap, new ArrayList<>());
     }
 
 
-    private void displayMap(GoogleMap mMap){
+    private void displayMap(GoogleMap mMap, List<Bus> busList){
 
         if(selDeparture.getCode() != null && selArrival.getCode() != null){
             if(!selDeparture.getCode().isEmpty() && !selArrival.getCode().isEmpty()) {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(selDeparture.getRtLat(), selDeparture.getRtLng())).title(selDeparture.getName()));
-                mMap.addMarker(new MarkerOptions().position(new LatLng(selArrival.getRtLat(), selArrival.getRtLng())).title(selArrival.getName())
-                        .icon(BitmapFromVector(getContext(), R.drawable.ic_location_on_green)));
-            }
-        }
+//                mMap.addMarker(new MarkerOptions().position(new LatLng(selArrival.getRtLat(), selArrival.getRtLng())).title(selArrival.getName())
+//                        .icon(BitmapFromVector(getContext(), R.drawable.ic_location_on_green)));
+                mMap.addMarker(new MarkerOptions().position(new LatLng(selArrival.getRtLat(), selArrival.getRtLng())).title(selArrival.getName()));
 
-        for (Bus bus:getListBus()) {
-            mMap.addMarker(new MarkerOptions().position(new LatLng(bus.getRtLat(),bus.getRtLng()))
-                    .title("Bus " + bus.getImmat() + " à ... min de " + selArrival.getName())
-                    .icon(BitmapFromVector(getContext(), R.drawable.ic_bus_24)));
-        }
-//        LatLng bus4 = new LatLng(4.0430068,9.6906967);
-//        mMap.addMarker(new MarkerOptions().position(stopN2).title("Pont Joss").icon(BitmapFromVector(getContext(), R.drawable.ic_stop)));
+                if(busList != null && !busList.isEmpty()) {
+                    for (Bus bus : busList) {
+                        Log.i(TAG, "BUS : " + bus.getImmatriculation() + " with coordinates " + bus.getLatitude() + ", " + bus.getLongitude());
+                        // Calculer la distance et le temps d'attente approximatif
 
-        LatLng mapCenter = new LatLng(4.02535,9.692945500000002);
+                        String busCoord = getLatLngString(new LatLng(Double.valueOf(bus.getLatitude()), Double.valueOf(bus.getLongitude())));
+                        Log.i(TAG, "BUS COORD = " + busCoord);
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(Double.valueOf(bus.getLatitude()), Double.valueOf(bus.getLongitude())))
+                                .title("Bus " + bus.getImmatriculation() + " à " + bus.getTimeText() + " (" + bus.getDistanceText() + ") de " + selArrival.getName())
+                                .icon(BitmapFromVector(getContext(), R.drawable.ic_bus_24)));
+                    }
+                }
+        //        LatLng bus4 = new LatLng(4.0430068,9.6906967);
+        //        mMap.addMarker(new MarkerOptions().position(stopN2).title("Pont Joss").icon(BitmapFromVector(getContext(), R.drawable.ic_stop)));
 
-        // Marche des fleurs
-        String startPoint = "ChIJR6V9NEcTYRAR2nFJ3LdoKgQ";
-        // CamWater
-        String stop1 = "ChIJEabOr8ISYRARc9fLYw6i0V8";
-        // Pont Joss
-        String stop2 = "EhpSdWUgSm9zcywgRG91YWxhLCBDYW1lcm9vbiIuKiwKFAoSCePtD47wEmEQERltc7wsBTW3EhQKEglt_uHiixJhEBGLxIFHRKHakg";
-        // Carrefour Leclerc
-        String stop3 = "";
-        // Carrefour Soudanais
-//        String endPoint = "ChIJ8QPF7aETYRARNUHFuNM0Xxk2MXV+6P2";
-        String endPoint = "ChIJ8QPF7aETYRARNUHFuNM0Xxk";
+        //        LatLng mapCenter = new LatLng(4.02535,9.692945500000002);
+                LatLng mapCenter = new LatLng(selDeparture.getRtLat(), selDeparture.getRtLng());
 
-        //Define list to get all latlng for the route
-        List<LatLng> path = new ArrayList();
+                // Marche des fleurs
+                String startPoint = "ChIJR6V9NEcTYRAR2nFJ3LdoKgQ";
+                // CamWater
+                String stop1 = "ChIJEabOr8ISYRARc9fLYw6i0V8";
+                // Pont Joss
+                String stop2 = "EhpSdWUgSm9zcywgRG91YWxhLCBDYW1lcm9vbiIuKiwKFAoSCePtD47wEmEQERltc7wsBTW3EhQKEglt_uHiixJhEBGLxIFHRKHakg";
+                // Carrefour Leclerc
+                String stop3 = "";
+                // Carrefour Soudanais
+        //        String endPoint = "ChIJ8QPF7aETYRARNUHFuNM0Xxk2MXV+6P2";
+                String endPoint = "ChIJ8QPF7aETYRARNUHFuNM0Xxk";
 
-        String dep = getLatLngString(new LatLng(selDeparture.getRtLat(),selDeparture.getRtLng()));
-        String arr = getLatLngString(new LatLng(selArrival.getRtLat(),selArrival.getRtLng()));
+                //Define list to get all latlng for the route
+                List<LatLng> path = new ArrayList();
 
-        String gmApiKey = getContext().getResources().getText(R.string.google_maps_key ).toString();
-        Log.i(TAG, "API KEY = " + gmApiKey);
+                String dep = getLatLngString(new LatLng(selDeparture.getRtLat(),selDeparture.getRtLng()));
+                String arr = getLatLngString(new LatLng(selArrival.getRtLat(),selArrival.getRtLng()));
 
-        //Execute Directions API request
-        GeoApiContext context = new GeoApiContext.Builder()
-                .apiKey(gmApiKey)
-                .build();
-        DirectionsApiRequest req = DirectionsApi.getDirections(context, dep, arr);
-//        DirectionsApiRequest req = DirectionsApi.getDirections(context, "place_id:"+startPoint, "place_id:"+endPoint);
-        try {
-            Log.i(TAG, "DEPARTURE = " + dep);
-            Log.i(TAG, "ARRIVAL = " + arr);
-            DirectionsResult res = req.await();
-            Log.i(TAG, "DEPARTURE = " + dep);
-            Log.i(TAG, "ARRIVAL = " + arr);
+                String gmApiKey = getContext().getResources().getText(R.string.google_maps_key ).toString();
+                Log.i(TAG, "API KEY = " + gmApiKey);
 
-            //Loop through legs and steps to get encoded polylines of each step
-            if (res.routes != null && res.routes.length > 0) {
-                Log.i(TAG, "INFO : " + res.routes.length + " route found");
-                DirectionsRoute route = res.routes[0];
+                //Execute Directions API request
+                GeoApiContext context = new GeoApiContext.Builder()
+                        .apiKey(gmApiKey)
+                        .build();
+                DirectionsApiRequest req = DirectionsApi.getDirections(context, dep, arr);
+        //        DirectionsApiRequest req = DirectionsApi.getDirections(context, "place_id:"+startPoint, "place_id:"+endPoint);
+                try {
+                    Log.i(TAG, "DEPARTURE = " + dep);
+                    Log.i(TAG, "ARRIVAL = " + arr);
+                    DirectionsResult res = req.await();
+                    Log.i(TAG, "DEPARTURE = " + dep);
+                    Log.i(TAG, "ARRIVAL = " + arr);
 
-                if (route.legs !=null) {
-                    for(int i=0; i<route.legs.length; i++) {
-                        DirectionsLeg leg = route.legs[i];
-                        if (leg.steps != null) {
-                            for (int j=0; j<leg.steps.length;j++){
-                                DirectionsStep step = leg.steps[j];
-                                if (step.steps != null && step.steps.length >0) {
-                                    for (int k=0; k<step.steps.length;k++){
-                                        DirectionsStep step1 = step.steps[k];
-                                        EncodedPolyline points1 = step1.polyline;
-                                        if (points1 != null) {
-                                            //Decode polyline and add points to list of route coordinates
-                                            List<com.google.maps.model.LatLng> coords1 = points1.decodePath();
-                                            for (com.google.maps.model.LatLng coord1 : coords1) {
-                                                path.add(new LatLng(coord1.lat, coord1.lng));
+                    //Loop through legs and steps to get encoded polylines of each step
+                    if (res.routes != null && res.routes.length > 0) {
+                        Log.i(TAG, "INFO : " + res.routes.length + " route found");
+                        DirectionsRoute route = res.routes[0];
+
+                        if (route.legs !=null) {
+                            for(int i=0; i<route.legs.length; i++) {
+                                DirectionsLeg leg = route.legs[i];
+                                if (leg.steps != null) {
+                                    for (int j=0; j<leg.steps.length;j++){
+                                        DirectionsStep step = leg.steps[j];
+                                        if (step.steps != null && step.steps.length >0) {
+                                            for (int k=0; k<step.steps.length;k++){
+                                                DirectionsStep step1 = step.steps[k];
+                                                EncodedPolyline points1 = step1.polyline;
+                                                if (points1 != null) {
+                                                    //Decode polyline and add points to list of route coordinates
+                                                    List<com.google.maps.model.LatLng> coords1 = points1.decodePath();
+                                                    for (com.google.maps.model.LatLng coord1 : coords1) {
+                                                        path.add(new LatLng(coord1.lat, coord1.lng));
+                                                    }
+                                                }
                                             }
-                                        }
-                                    }
-                                } else {
-                                    EncodedPolyline points = step.polyline;
-                                    if (points != null) {
-                                        //Decode polyline and add points to list of route coordinates
-                                        List<com.google.maps.model.LatLng> coords = points.decodePath();
-                                        for (com.google.maps.model.LatLng coord : coords) {
-                                            path.add(new LatLng(coord.lat, coord.lng));
+                                        } else {
+                                            EncodedPolyline points = step.polyline;
+                                            if (points != null) {
+                                                //Decode polyline and add points to list of route coordinates
+                                                List<com.google.maps.model.LatLng> coords = points.decodePath();
+                                                for (com.google.maps.model.LatLng coord : coords) {
+                                                    path.add(new LatLng(coord.lat, coord.lng));
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
+                            Log.i(TAG, "INFO : " + path.size() + " points for path to draw");
+                        }
+                        else{
+                            Log.e(TAG, "Exception : Route is null");
                         }
                     }
-                    Log.i(TAG, "INFO : " + path.size() + " points for path to draw");
+                    else{
+                        Log.e(TAG, "Exception : No route found");
+                    }
+                } catch(Exception ex) {
+                    Log.e(TAG, "Exception : " + ex.getLocalizedMessage());
+                    Log.e(TAG, ex.getLocalizedMessage());
                 }
-                else{
-                    Log.e(TAG, "Exception : Route is null");
+
+                //Draw the polyline
+                if (path.size() > 0) {
+                    PolylineOptions opts = new PolylineOptions().addAll(path).color(getContext().getResources().getColor(R.color.primary)).width(12);
+                    mMap.addPolyline(opts);
                 }
+
+                mMap.getUiSettings().setZoomControlsEnabled(true);
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, 14));
             }
-            else{
-                Log.e(TAG, "Exception : No route found");
-            }
-        } catch(Exception ex) {
-            Log.e(TAG, "Exception : " + ex.getLocalizedMessage());
-            Log.e(TAG, ex.getLocalizedMessage());
         }
 
-        //Draw the polyline
-        if (path.size() > 0) {
-            PolylineOptions opts = new PolylineOptions().addAll(path).color(getContext().getResources().getColor(R.color.primary)).width(12);
-            mMap.addPolyline(opts);
-        }
-
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, 14));
     }
 
 
@@ -641,23 +660,291 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    private  ArrayList<LineItem> getListLines() {
-        ArrayList<LineItem> list = new ArrayList<LineItem>();
-        LineItem line0 = new LineItem("", "Select one item", "", "");
-        LineItem line1 = new LineItem("087", "Marché des fleurs", "Carrefour Soudanaise", "MDF, CCW, PTJ, CLC, CSO");
-        LineItem line2 = new LineItem("076", "Marché Sandaga", "Carrefour BASSONG", "BCF, EPD, AKN, RBD, PVT, RPP, RPL");
-        LineItem line3 = new LineItem("012", "Salle des fêtes AKWA", "Rail BONABERI", "FRB, RPD, NRM, BAG");
+    private List<Bus> getLineNextBus(String startPoint, String endPoint){
+        DataUtils.showProgressDialog(pDialog);
 
+        List<Bus> list = new ArrayList<>();
 
-        //list.add(line0);
-        list.add(line1);
-        list.add(line2);
-        list.add(line3);
+        /*LineItem li = getLine(startPoint, endPoint);
+        if(li != null){
+            Log.i(TAG, "LINE TO DRAW : " + li.toString());
+            list = getLineBusList(li.getCode());
+        } else{
+            Log.i(TAG, "NO LINE FOUND!!");
+        }*/
+
+        Call<List<Line>> call = RetrofitClient.getInstance(token).getMyApi().findLines(null, null, null, null, null, startPoint, endPoint);
+        call.enqueue(new Callback<List<Line>>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(Call<List<Line>> call, retrofit2.Response<List<Line>> response) {
+
+                Log.i(TAG, "URL : " + call.request().url().toString());
+                List<Line> lines = response.body();
+                if (lines != null && !lines.isEmpty()) {
+                    Log.i(TAG, "LINE SIZE : " + lines.size());
+                    for (Line line : lines) {
+                        Call<List<Bus>> call2 = RetrofitClient.getInstance(token).getMyApi().getLineBus(line.getUuid());
+                        call2.enqueue(new Callback<List<Bus>>() {
+                            @RequiresApi(api = Build.VERSION_CODES.O)
+                            @Override
+                            public void onResponse(Call<List<Bus>> call2, retrofit2.Response<List<Bus>> response) {
+
+                                Log.i(TAG, "URL : " + call2.request().url().toString());
+                                List<Bus> busList = response.body();
+                                if (busList != null && !busList.isEmpty()) {
+                                    Log.i(TAG, "BUS SIZE : " + busList.size());
+                                    for (Bus bus : busList) {
+                                        /*WaitingDetail wd = getBusWaitingTime(bus.getLatitude(), bus.getLongitude(),
+                                                String.valueOf(selArrival.getRtLat()), String.valueOf(selArrival.getRtLng()));
+                                        // if(line.getType().equals("STOP")
+                                        bus.setDistance(wd.getDistance());
+                                        bus.setDistanceText(wd.getDistance_text());
+                                        bus.setTime(wd.getTime());
+                                        bus.setTimeText(wd.getTime_text());
+                                        list.add(bus);*/
+                                        Call<WaitingDetail> call = RetrofitClient.getInstance(token).getMyApi().getWaitingTime(bus.getLatitude(), bus.getLongitude(),
+                                                String.valueOf(selArrival.getRtLat()), String.valueOf(selArrival.getRtLng()));
+                                        call.enqueue(new Callback<WaitingDetail>() {
+                                            @RequiresApi(api = Build.VERSION_CODES.O)
+                                            @Override
+                                            public void onResponse(Call<WaitingDetail> call, retrofit2.Response<WaitingDetail> response) {
+
+                                                Log.i(TAG, "URL : " + call.request().url().toString());
+                                                WaitingDetail wdet = response.body();
+                                                if (wdet != null) {
+                                                    Log.i(TAG, "WAITING DETAIL : " + wdet.toString());
+                                                    WaitingDetail wd = getBusWaitingTime(bus.getLatitude(), bus.getLongitude(),
+                                                            String.valueOf(selArrival.getRtLat()), String.valueOf(selArrival.getRtLng()));
+                                                    // if(line.getType().equals("STOP")
+                                                    bus.setDistance(wd.getDistance());
+                                                    bus.setDistanceText(wd.getDistance_text());
+                                                    bus.setTime(wd.getTime());
+                                                    bus.setTimeText(wd.getTime_text());
+                                                    list.add(bus);
+                                                }
+                                                else {
+                                                    // sign-in failed
+                                                    Toast.makeText(getContext(), "No line found!!", Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<WaitingDetail> call, Throwable throwable) {
+                                                Log.i(TAG, throwable.getMessage());
+                                                Toast.makeText(getContext(), "An error has occured when fetch url " + call.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+
+                                        });
+
+                                    }
+
+                                    mapLine.setVisibility(View.VISIBLE);
+                                    pInfoLayout.setVisibility(View.VISIBLE);
+                                    infoLayout.setVisibility(View.GONE);
+                                    actionLayout.setVisibility(View.VISIBLE);
+
+                                    if(mMap != null){
+                                        mMap.clear();
+
+                                        displayMap(mMap, busList);
+                                    }
+                                }
+                                else {
+                                    // sign-in failed
+                                    Toast.makeText(getContext(), "No bus found fir this line!!", Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<Bus>> call2, Throwable throwable) {
+                                Log.i(TAG, throwable.getMessage());
+                                Toast.makeText(getContext(), "An error has occured when fetch url " + call2.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+
+                        });
+                    }
+                }
+                else {
+                    // sign-in failed
+                    Toast.makeText(getContext(), "No line found!!", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Line>> call, Throwable throwable) {
+                Log.i(TAG, throwable.getMessage());
+                Toast.makeText(getContext(), "An error has occured when fetch url " + call.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+        });
+        DataUtils.hideProgressDialog(pDialog);
 
         return list;
     }
 
-    private  ArrayList<Bus> getListBus() {
+
+    private  LineItem getLine(String startPoint, String endPoint) {
+        final LineItem[] li = {null};
+        List<LineItem> list = new ArrayList<>();
+
+        Call<List<Line>> call = RetrofitClient.getInstance(token).getMyApi().findLines(null, null, null, null, null, startPoint, endPoint);
+        call.enqueue(new Callback<List<Line>>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(Call<List<Line>> call, retrofit2.Response<List<Line>> response) {
+
+                Log.i(TAG, "URL : " + call.request().url().toString());
+                List<Line> lines = response.body();
+                if (lines != null && !lines.isEmpty()) {
+                    Log.i(TAG, "LINE SIZE : " + lines.size());
+                    for (Line line : lines) {
+                        // if(line.getType().equals("STOP")
+                        list.add(new LineItem(line.getUuid(), line.getStartPoint().getName(),  line.getEndPoint().getName(), ""));
+                    }
+                }
+                else {
+                    // sign-in failed
+                    Toast.makeText(getContext(), "No line found!!", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Line>> call, Throwable throwable) {
+                Log.i(TAG, throwable.getMessage());
+                Toast.makeText(getContext(), "An error has occured when fetch url " + call.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+        });
+
+        if(list.size() > 0)
+            Log.i(TAG, "LINE : " + list.get(0).toString());
+
+        return list.size() > 0 ? list.get(0) : null;
+    }
+
+
+    private  ArrayList<LineItem> getListLines() {
+        ArrayList<LineItem> list = new ArrayList<LineItem>();
+        LineItem line0 = new LineItem("", "Select one item", "", "");
+
+        Call<List<Line>> call = RetrofitClient.getInstance(token).getMyApi().findLines(null, null, null, null, null, null, null);
+        call.enqueue(new Callback<List<Line>>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(Call<List<Line>> call, retrofit2.Response<List<Line>> response) {
+
+                Log.i(TAG, "URL : " + call.request().url().toString());
+                List<Line> lines = response.body();
+                if (lines != null && !lines.isEmpty()) {
+                    Log.i(TAG, "LINE SIZE : " + lines.size());
+                    String roles = null;
+                    for (Line line : lines) {
+                        // if(line.getType().equals("STOP")
+                        list.add(new LineItem(line.getUuid(), line.getStartPoint().getName(),  line.getEndPoint().getName(), ""));
+                    }
+                    // hide the progress bar
+//                    progressbar.setVisibility(View.GONE);
+
+                }
+                else {
+
+                    // sign-in failed
+                    Toast.makeText(getContext(), "No line found!!", Toast.LENGTH_LONG).show();
+
+                    // hide the progress bar
+//                    progressbar.setVisibility(View.GONE);
+                }
+                DataUtils.hideProgressDialog(pDialog);
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Line>> call, Throwable throwable) {
+                Log.i(TAG, throwable.getMessage());
+                Toast.makeText(getContext(), "An error has occured when fetch url " + call.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                // hide the progress bar
+//                progressbar.setVisibility(View.GONE);
+                DataUtils.hideProgressDialog(pDialog);
+            }
+
+        });
+
+        return list;
+    }
+
+
+    private  ArrayList<Bus> getLineBusList(String lineUuid) {
+        ArrayList<Bus> list = new ArrayList<Bus>();
+        Log.i(TAG, "LINE UUID : " + lineUuid);
+
+        Call<List<Bus>> call = RetrofitClient.getInstance(token).getMyApi().getLineBus(lineUuid);
+        call.enqueue(new Callback<List<Bus>>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(Call<List<Bus>> call, retrofit2.Response<List<Bus>> response) {
+
+                Log.i(TAG, "URL : " + call.request().url().toString());
+                List<Bus> busList = response.body();
+                if (busList != null && !busList.isEmpty()) {
+                    Log.i(TAG, "BUS SIZE : " + busList.size());
+                    for (Bus bus : busList) {
+                        // if(line.getType().equals("STOP")
+                        list.add(new Bus(bus.getUuid(), bus.getNumChassis(), bus.getImmatriculation(),  bus.getLatitude(), bus.getLongitude()));
+                    }
+                }
+                else {
+                    // sign-in failed
+                    Toast.makeText(getContext(), "No bus found fir this line!!", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Bus>> call, Throwable throwable) {
+                Log.i(TAG, throwable.getMessage());
+                Toast.makeText(getContext(), "An error has occured when fetch url " + call.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+        });
+
+        return list;
+    }
+
+
+    private WaitingDetail getBusWaitingTime(String startLat, String startLng, String endLat, String endLng) {
+        final WaitingDetail[] waitingDetail = {null};
+
+        Call<WaitingDetail> call = RetrofitClient.getInstance(token).getMyApi().getWaitingTime(startLat, startLng, endLat, endLng);
+        call.enqueue(new Callback<WaitingDetail>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(Call<WaitingDetail> call, retrofit2.Response<WaitingDetail> response) {
+
+                Log.i(TAG, "URL : " + call.request().url().toString());
+                WaitingDetail wd = response.body();
+                if (wd != null) {
+                    Log.i(TAG, "WAITING DETAIL : " + wd.toString());
+                    waitingDetail[0] = wd;
+                }
+                else {
+                    // sign-in failed
+                    Toast.makeText(getContext(), "No line found!!", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<WaitingDetail> call, Throwable throwable) {
+                Log.i(TAG, throwable.getMessage());
+                Toast.makeText(getContext(), "An error has occured when fetch url " + call.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+        });
+
+        return waitingDetail[0];
+    }
+
+
+    /*private  ArrayList<Bus> getListBus() {
         ArrayList<Bus> list = new ArrayList<Bus>();
         Bus bus0 = new Bus("245", 4.02535, 9.6942605, "LT7837KI");
         Bus bus1 = new Bus("087", 4.031871499999999, 9.6906967, "LT207BV");
@@ -679,7 +966,7 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
         list.add(bus4);
 
         return list;
-    }
+    }*/
 
     private  ArrayList<StopItem> getListDepartureStops() {
         DataUtils.showProgressDialog(pDialog);
@@ -687,7 +974,7 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
         ArrayList<StopItem> list = new ArrayList<StopItem>();
         list.add(new StopItem("", getResources().getString(R.string.current_pos),  "", 0d, 0d));
 
-        Call<List<POI>> call = RetrofitClient.getInstance().getMyApi().findStops();
+        Call<List<POI>> call = RetrofitClient.getInstance(token).getMyApi().findStops();
         call.enqueue(new Callback<List<POI>>() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -700,7 +987,7 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
                     String roles = null;
                     for (POI poi : pois) {
                         // if(poi.getType().equals("STOP")
-                        list.add(new StopItem(poi.getCode(), poi.getName(),  "", Double.valueOf(poi.getLatitude()), Double.valueOf(poi.getLongitude())));
+                        list.add(new StopItem(poi.getUuid(), poi.getName(),  "", Double.valueOf(poi.getLatitude()), Double.valueOf(poi.getLongitude())));
                     }
                     // hide the progress bar
 //                    progressbar.setVisibility(View.GONE);
@@ -734,24 +1021,86 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
 
 
     private  ArrayList<StopItem> getListArrivalStops() {
+        DataUtils.showProgressDialog(pDialog);
+
         ArrayList<StopItem> list = new ArrayList<StopItem>();
-        StopItem stop0 = new StopItem("", getResources().getString(R.string.next_stop),  "", 0d, 0d);
-        StopItem stop1 = new StopItem("CCW", "Carrefour CamWater",  "087, 076, 046", 4.031871499999999,9.690278900000001);
-        StopItem stop2 = new StopItem("PTJ", "Pont Joss",  "076, 087, 039, 054", 4.0430068,9.6906967);
-        StopItem stop3 = new StopItem("CLC", "Carrefour Leclerc", "012, 076, 087, 064",4.0330068,9.690278900000001);
-        StopItem stop4 = new StopItem("MDF", "Marché des fleurs",  "076, 087, 019, 058", 4.02535,9.692945500000002);
-        StopItem stop5 = new StopItem("CSO", "Carrefour Soudanaise", "012, 046, 087, 046", 4.0480242,9.6942605);
+        list.add(new StopItem("", getResources().getString(R.string.next_stop),  "", 0d, 0d));
 
+        Call<List<POI>> call = RetrofitClient.getInstance(token).getMyApi().findStops();
+        call.enqueue(new Callback<List<POI>>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(Call<List<POI>> call, retrofit2.Response<List<POI>> response) {
 
-        list.add(stop0);
-        list.add(stop1);
-        list.add(stop2);
-        list.add(stop3);
-        list.add(stop4);
-        list.add(stop5);
+                Log.i(TAG, "URL : " + call.request().url().toString());
+                List<POI> pois = response.body();
+                if (pois != null && !pois.isEmpty()) {
+                    Log.i(TAG, "POI SIZE : " + pois.size());
+                    String roles = null;
+                    for (POI poi : pois) {
+                        Log.i(TAG, "CURRENT STOP : " + settings.getStringValue(getContext(), settings.PREFS_USER_CURRENT_STOP_KEY));
+                        // if(poi.getType().equals("STOP")
+                        if(!poi.getUuid().equals(settings.getStringValue(getContext(), settings.PREFS_USER_CURRENT_STOP_KEY))) {
+                            list.add(new StopItem(poi.getUuid(), poi.getName(), "", Double.valueOf(poi.getLatitude()), Double.valueOf(poi.getLongitude())));
+                        }
+                    }
+                    // hide the progress bar
+//                    progressbar.setVisibility(View.GONE);
+
+                }
+                else {
+
+                    // sign-in failed
+                    Toast.makeText(getContext(), "Login failed!!", Toast.LENGTH_LONG).show();
+
+                    // hide the progress bar
+//                    progressbar.setVisibility(View.GONE);
+                }
+                DataUtils.hideProgressDialog(pDialog);
+
+            }
+
+            @Override
+            public void onFailure(Call<List<POI>> call, Throwable throwable) {
+                Log.i(TAG, throwable.getMessage());
+                Toast.makeText(getContext(), "An error has occured when fetch url " + call.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                // hide the progress bar
+//                progressbar.setVisibility(View.GONE);
+                DataUtils.hideProgressDialog(pDialog);
+            }
+
+        });
 
         return list;
     }
+
+
+    private  ArrayList<StopItem> initListArrivalStops() {
+        ArrayList<StopItem> list = new ArrayList<StopItem>();
+        list.add(new StopItem("", getResources().getString(R.string.next_stop),  "", 0d, 0d));
+
+        return list;
+    }
+
+    private void populateDepStopDropDown(ArrayList<StopItem> departureStopsDetails) {
+        depStopAdapter = new ArrayAdapter<StopItem>(getContext(),
+                android.R.layout.simple_spinner_item,
+                departureStopsDetails);
+
+        depStopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.departure.setAdapter(depStopAdapter);
+    }
+
+    private void populateArrStopDropDown(ArrayList<StopItem> arrivalStopsDetails) {
+        arrStopAdater = new ArrayAdapter<StopItem>(getContext(),
+                android.R.layout.simple_spinner_item,
+                arrivalStopsDetails);
+
+        arrStopAdater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.arrival.setAdapter(arrStopAdater);
+    }
+
+
 
 
     /**
