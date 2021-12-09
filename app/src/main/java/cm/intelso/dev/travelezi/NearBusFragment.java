@@ -52,6 +52,7 @@ import com.google.maps.model.EncodedPolyline;
 
 import org.json.JSONArray;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -120,7 +121,7 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
     // Progress dialog
     private ProgressDialog pDialog;
 
-    private static String TAG = MainActivity.class.getSimpleName();
+    private static String TAG = NearBusFragment.class.getSimpleName();
     String url = "http://192.168.25.179/touristique/web/index.php/apiv1/ville";
     private String jsonResponse;
 
@@ -243,7 +244,9 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
                     return;
                 }
 
+//                List<Bus> busList = new ArrayList<>();
                 List<Bus> busList = getLineNextBus(selDeparture.getCode(), selArrival.getCode());
+
 
                 Bundle bundle=new Bundle();
                 bundle.putString("departureID", selDeparture.getCode());
@@ -257,74 +260,18 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.app_content_frame, newContent).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .addToBackStack(null).commit();*/
-//
-//                mapLine.setVisibility(View.VISIBLE);
-//                pInfoLayout.setVisibility(View.VISIBLE);
-//                infoLayout.setVisibility(View.GONE);
-//                actionLayout.setVisibility(View.VISIBLE);
-//
-//                if(mMap != null){
-//                    mMap.clear();
-//
-//                    displayMap(mMap, busList);
-//                }
 
-                final ScheduledExecutorService waitingBusTaskExecutor = Executors.newScheduledThreadPool(5);
-                final AtomicInteger count = new AtomicInteger(10);
-                final AtomicInteger wc = new AtomicInteger(60);
+                /*mapLine.setVisibility(View.VISIBLE);
+                pInfoLayout.setVisibility(View.VISIBLE);
+                infoLayout.setVisibility(View.GONE);
+                actionLayout.setVisibility(View.VISIBLE);
 
-                // This schedule a runnable task every 30 seconds
-                waitingBusTaskExecutor.scheduleAtFixedRate(new Runnable() {
-                    public void run() {
-                        Log.i(TAG, "In waitingBusTaskExecutor");
-                        List<String> list = Arrays.asList(new String[] {"LT7837KI", "LT207BV", "LT951ZS", "LT451HG", "LT1320PM"});
-                        List<Integer> mins = Arrays.asList(new Integer[] {new Random().nextInt(14), new Random().nextInt(24),
-                                new Random().nextInt(34), new Random().nextInt(54), new Random().nextInt(40)});
-                        String msg = "";
-                        int it = new Random().nextInt(4) ;
-                        int ct = new Random().nextInt(wc.get()) ;
-                        wc.set(ct);
-                        count.getAndDecrement();
+                if(mMap != null){
+                    mMap.clear();
 
-                        if(it == 0 || count.get() == 0 || ct == 0){
-                            msg = "Le bus " + list.get(it) + " arrivé à la station " + selArrival;
-                            Log.i(TAG, "In " + msg);
-//                            infoLayout.setVisibility(View.GONE);
-//                            actionLayout.setVisibility(View.VISIBLE);
-                            abInfo.setText(msg);
-                            abInfo.setTextColor(getResources().getColor(R.color.primary_text));
-                            btnTakeBus.setClickable(true);
-                            btnTakeBus.setText(getResources().getString(R.string.take_bus));
-                            btnTakeBus.setBackground(getResources().getDrawable(R.drawable.component_gray_bg));
-//                            pInfoLayout.refreshDrawableState();
-//                            actionLayout.refreshDrawableState();
-//                            btnTakeBus.invalidate();
-//                            pInfoLayout.invalidate();
-//                            actionLayout.invalidate();
-                            busTake = list.get(it);
-                            Log.i(TAG, msg);
-                            MediaPlayer mp = MediaPlayer.create(getContext(), RingtoneManager.getActualDefaultRingtoneUri(getContext(), RingtoneManager.TYPE_NOTIFICATION));
-                            mp.start();
-                            waitingBusTaskExecutor.shutdown();
-                            // Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
-                        } else{
-                            msg = "En attente de bus " + list.get(it) + " à la station " + selArrival + " dans " + ct + " min";
-//                            wbInfo.setText(msg);
-//                            infoLayout.setVisibility(View.VISIBLE);
-//                            actionLayout.setVisibility(View.GONE);
-                            // Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
-                            abInfo.setText(msg);
-                            abInfo.setTextColor(getResources().getColor(R.color.red_color));
-                            btnTakeBus.setClickable(false);
-                            btnTakeBus.setText("");
-                            btnTakeBus.setBackgroundColor(getResources().getColor(R.color.gray_color));
-//                            btnTakeBus.setBackground(getResources().getDrawable(R.drawable.component_gray_bg));
-                            Log.i(TAG, msg);
-                            MediaPlayer mp = MediaPlayer.create(getContext(), RingtoneManager.getActualDefaultRingtoneUri(getContext(), RingtoneManager.TYPE_NOTIFICATION));
-                            mp.start();
-                        }
-                    }
-                }, 0, 15, TimeUnit.SECONDS);
+                    displayMap(mMap, busList);
+                }*/
+
             }
         });
 
@@ -401,6 +348,7 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
         selDeparture = (StopItem) adapter.getItem(position);
 
         if(!selDeparture.getCode().isEmpty()) {
+            Log.i(TAG, "DEP STOP : " + selDeparture.getCode());
             settings.save(getContext(), settings.PREFS_USER_CURRENT_STOP_KEY, selDeparture.getCode());
             arrivalStopsDetails = getListArrivalStops();
         } else{
@@ -417,6 +365,7 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
         selArrival = (StopItem) adapter.getItem(position);
 
         if(!selArrival.getCode().isEmpty()) {
+            Log.i(TAG, "ARR STOP : " + selArrival.getCode());
             settings.save(getContext(), settings.PREFS_USER_NEXT_STOP_KEY, selArrival.getCode());
         }
 
@@ -660,6 +609,121 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
+    private void waitingNextBusNotification(){
+
+        final ScheduledExecutorService waitingBusTaskExecutor = Executors.newScheduledThreadPool(1);
+        final AtomicInteger count = new AtomicInteger(10);
+        final AtomicInteger wc = new AtomicInteger(60);
+
+        // This schedule a runnable task every 30 seconds
+        waitingBusTaskExecutor.scheduleAtFixedRate(new Runnable() {
+            public void run() {
+                Log.i(TAG, "In waitingBusTaskExecutor");
+                List<Bus> busList = getUpdatedBusDetails(selDeparture.getCode(), selArrival.getCode());
+                String msg = "";
+
+                for (Bus bus : busList) {
+                    if(bus.getDistance() < 500 || bus.getTime() < 120){
+                        msg = "Le bus " + bus.getImmatriculation() + " arrivé à la station " + selArrival;
+                        Log.i(TAG, "In " + msg);
+//                            infoLayout.setVisibility(View.GONE);
+//                            actionLayout.setVisibility(View.VISIBLE);
+                        abInfo.setText(msg);
+                        abInfo.setTextColor(getResources().getColor(R.color.primary_text));
+                        btnTakeBus.setClickable(true);
+                        btnTakeBus.setText(getResources().getString(R.string.take_bus));
+                        btnTakeBus.setBackground(getResources().getDrawable(R.drawable.component_gray_bg));
+//                            pInfoLayout.refreshDrawableState();
+//                            actionLayout.refreshDrawableState();
+//                            btnTakeBus.invalidate();
+//                            pInfoLayout.invalidate();
+//                            actionLayout.invalidate();
+                        busTake = bus.getImmatriculation();
+                        Log.i(TAG, msg);
+                        MediaPlayer mp = MediaPlayer.create(getContext(), RingtoneManager.getActualDefaultRingtoneUri(getContext(), RingtoneManager.TYPE_NOTIFICATION));
+                        mp.start();
+                        waitingBusTaskExecutor.shutdown();
+                        // Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+                    } else{
+                        msg = "En attente de bus " + bus.getImmatriculation() + " à la station " + selArrival + " dans " + bus.getTimeText();
+//                            wbInfo.setText(msg);
+//                            infoLayout.setVisibility(View.VISIBLE);
+//                            actionLayout.setVisibility(View.GONE);
+                        // Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+                        abInfo.setText(msg);
+                        abInfo.setTextColor(getResources().getColor(R.color.red_color));
+                        btnTakeBus.setClickable(false);
+                        btnTakeBus.setText("");
+                        btnTakeBus.setBackgroundColor(getResources().getColor(R.color.gray_color));
+//                            btnTakeBus.setBackground(getResources().getDrawable(R.drawable.component_gray_bg));
+                        Log.i(TAG, msg);
+                        MediaPlayer mp = MediaPlayer.create(getContext(), RingtoneManager.getActualDefaultRingtoneUri(getContext(), RingtoneManager.TYPE_NOTIFICATION));
+                        mp.start();
+                    }
+                    // Update map
+
+                    try {
+                        this.wait(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, 0, 60, TimeUnit.SECONDS);
+    }
+
+
+    private List<Bus> getUpdatedBusDetails(String startPoint, String endPoint){
+        DataUtils.showProgressDialog(pDialog);
+
+        List<Bus> list = new ArrayList<>();
+
+        Call<List<Line>> call = RetrofitClient.getInstance(token).getMyApi().findLines(null, null, null, null, null, startPoint, endPoint);
+        try {
+            List<Line> lines = call.execute().body();
+            if (lines != null && !lines.isEmpty()) {
+                Log.i(TAG, "LINE SIZE : " + lines.size());
+                for (Line line : lines) {
+                    // if(line.getType().equals("STOP")
+                    Call<List<Bus>> call2 = RetrofitClient.getInstance(token).getMyApi().getLineBus(line.getUuid());
+                    List<Bus> busList = call2.execute().body();
+                    if (busList != null && !busList.isEmpty()) {
+                        Log.i(TAG, "BUS SIZE : " + busList.size());
+                        for (Bus bus : busList) {
+                            Call<WaitingDetail> call3 = RetrofitClient.getInstance(token).getMyApi().getWaitingTime(bus.getLatitude(), bus.getLongitude(),
+                                    String.valueOf(selArrival.getRtLat()), String.valueOf(selArrival.getRtLng()));
+                            WaitingDetail wdet = call3.execute().body();
+                            if (wdet != null) {
+                                Log.i(TAG, "WAITING DETAIL : " + wdet.toString());
+                                WaitingDetail wd = getBusWaitingTime(bus.getLatitude(), bus.getLongitude(),
+                                        String.valueOf(selArrival.getRtLat()), String.valueOf(selArrival.getRtLng()));
+                                // if(line.getType().equals("STOP")
+                                bus.setDistance(wd.getDistance());
+                                bus.setDistanceText(wd.getDistance_text());
+                                bus.setTime(wd.getTime());
+                                bus.setTimeText(wd.getTime_text());
+                                list.add(bus);
+                            } else {
+                                // sign-in failed
+                                Toast.makeText(getContext(), "No line found!!", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                // sign-in failed
+                Toast.makeText(getContext(), "No line found!!", Toast.LENGTH_LONG).show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+
     private List<Bus> getLineNextBus(String startPoint, String endPoint){
         DataUtils.showProgressDialog(pDialog);
 
@@ -703,19 +767,19 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
                                         bus.setTime(wd.getTime());
                                         bus.setTimeText(wd.getTime_text());
                                         list.add(bus);*/
-                                        Call<WaitingDetail> call = RetrofitClient.getInstance(token).getMyApi().getWaitingTime(bus.getLatitude(), bus.getLongitude(),
+                                        Call<WaitingDetail> call3 = RetrofitClient.getInstance(token).getMyApi().getWaitingTime(bus.getLatitude(), bus.getLongitude(),
                                                 String.valueOf(selArrival.getRtLat()), String.valueOf(selArrival.getRtLng()));
-                                        call.enqueue(new Callback<WaitingDetail>() {
+                                        call3.enqueue(new Callback<WaitingDetail>() {
                                             @RequiresApi(api = Build.VERSION_CODES.O)
                                             @Override
-                                            public void onResponse(Call<WaitingDetail> call, retrofit2.Response<WaitingDetail> response) {
+                                            public void onResponse(Call<WaitingDetail> call3, retrofit2.Response<WaitingDetail> response) {
 
-                                                Log.i(TAG, "URL : " + call.request().url().toString());
-                                                WaitingDetail wdet = response.body();
-                                                if (wdet != null) {
-                                                    Log.i(TAG, "WAITING DETAIL : " + wdet.toString());
-                                                    WaitingDetail wd = getBusWaitingTime(bus.getLatitude(), bus.getLongitude(),
-                                                            String.valueOf(selArrival.getRtLat()), String.valueOf(selArrival.getRtLng()));
+                                                Log.i(TAG, "URL : " + call3.request().url().toString());
+                                                WaitingDetail wd = response.body();
+                                                if (wd != null) {
+                                                    Log.i(TAG, "WAITING DETAIL : " + wd.toString());
+//                                                    WaitingDetail wd = getBusWaitingTime(bus.getLatitude(), bus.getLongitude(),
+//                                                            String.valueOf(selArrival.getRtLat()), String.valueOf(selArrival.getRtLng()));
                                                     // if(line.getType().equals("STOP")
                                                     bus.setDistance(wd.getDistance());
                                                     bus.setDistanceText(wd.getDistance_text());
@@ -730,25 +794,15 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
                                             }
 
                                             @Override
-                                            public void onFailure(Call<WaitingDetail> call, Throwable throwable) {
+                                            public void onFailure(Call<WaitingDetail> call3, Throwable throwable) {
                                                 Log.i(TAG, throwable.getMessage());
-                                                Toast.makeText(getContext(), "An error has occured when fetch url " + call.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                                                Toast.makeText(getContext(), "An error has occured when fetch url " + call3.request().url() + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
                                             }
 
                                         });
 
                                     }
 
-                                    mapLine.setVisibility(View.VISIBLE);
-                                    pInfoLayout.setVisibility(View.VISIBLE);
-                                    infoLayout.setVisibility(View.GONE);
-                                    actionLayout.setVisibility(View.VISIBLE);
-
-                                    if(mMap != null){
-                                        mMap.clear();
-
-                                        displayMap(mMap, busList);
-                                    }
                                 }
                                 else {
                                     // sign-in failed
@@ -779,6 +833,8 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
 
         });
         DataUtils.hideProgressDialog(pDialog);
+
+        Log.i(TAG, "BUS LIST SIZE : " + list.size());
 
         return list;
     }
@@ -968,8 +1024,9 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
         return list;
     }*/
 
-    private  ArrayList<StopItem> getListDepartureStops() {
+    private ArrayList<StopItem> getListDepartureStops() {
         DataUtils.showProgressDialog(pDialog);
+        Log.i(TAG, "IN getListDepartureStops() ");
 
         ArrayList<StopItem> list = new ArrayList<StopItem>();
         list.add(new StopItem("", getResources().getString(R.string.current_pos),  "", 0d, 0d));
@@ -1020,7 +1077,7 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    private  ArrayList<StopItem> getListArrivalStops() {
+    private ArrayList<StopItem> getListArrivalStops() {
         DataUtils.showProgressDialog(pDialog);
 
         ArrayList<StopItem> list = new ArrayList<StopItem>();
@@ -1038,7 +1095,6 @@ public class NearBusFragment extends Fragment implements OnMapReadyCallback {
                     Log.i(TAG, "POI SIZE : " + pois.size());
                     String roles = null;
                     for (POI poi : pois) {
-                        Log.i(TAG, "CURRENT STOP : " + settings.getStringValue(getContext(), settings.PREFS_USER_CURRENT_STOP_KEY));
                         // if(poi.getType().equals("STOP")
                         if(!poi.getUuid().equals(settings.getStringValue(getContext(), settings.PREFS_USER_CURRENT_STOP_KEY))) {
                             list.add(new StopItem(poi.getUuid(), poi.getName(), "", Double.valueOf(poi.getLatitude()), Double.valueOf(poi.getLongitude())));
