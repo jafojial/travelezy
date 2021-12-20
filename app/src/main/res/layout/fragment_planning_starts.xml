@@ -1,0 +1,86 @@
+ <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@android:color/transparent"
+    tools:context="cm.intelso.dev.travelezi.PlanningStartsFragment">
+
+     <LinearLayout
+         android:id="@+id/planning_mgt"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_alignParentTop="true"
+         android:layout_marginStart="10dp"
+         android:layout_marginLeft="10dp"
+         android:layout_marginTop="10dp"
+         android:layout_marginEnd="10dp"
+         android:layout_marginRight="10dp"
+         android:layout_marginBottom="10dp"
+         android:background="@drawable/component_gray_bg"
+         android:orientation="horizontal"
+         android:padding="10dp"
+         android:weightSum="1">
+
+         <TextView
+             android:id="@+id/tv_planning_line"
+             android:layout_width="0dp"
+             android:layout_height="match_parent"
+             android:layout_weight="1"
+             android:gravity="center|start"
+             android:text="@string/line_name"
+             tools:ignore="TextContrastCheck" />
+
+         <Button
+             android:id="@+id/btn_choose_line"
+             android:layout_width="50dp"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center|end"
+             android:background="@drawable/btn_bg"
+             android:foregroundGravity="left|center_vertical"
+             android:gravity="center"
+             android:minHeight="35dp"
+             android:text="@string/ok"
+             tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
+
+     </LinearLayout>
+
+     <androidx.recyclerview.widget.RecyclerView
+         android:id="@+id/start_list"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:layout_above="@id/p_add_start"
+         android:layout_below="@id/planning_mgt" />
+
+     <LinearLayout
+         android:id="@+id/p_add_start"
+         android:layout_width="match_parent"
+         android:layout_height="50dp"
+         android:layout_alignParentBottom="true"
+         android:background="@color/gray_color"
+         android:orientation="horizontal"
+         android:paddingLeft="10dp"
+         android:paddingRight="10dp">
+
+         <Spinner
+             android:id="@+id/paths"
+             android:layout_width="0dp"
+             android:layout_height="match_parent"
+             android:layout_weight="1"
+             android:gravity="center|start"
+             tools:ignore="SpeakableTextPresentCheck" />
+
+         <Button
+             android:id="@+id/btn_add_start"
+             style="@style/Widget.AppCompat.Button.Borderless"
+             android:layout_width="wrap_content"
+             android:layout_height="35dp"
+             android:layout_gravity="center"
+             android:background="@drawable/btn_bg"
+             android:text="@string/take_bus"
+             tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
+
+     </LinearLayout>
+
+</RelativeLayout>
