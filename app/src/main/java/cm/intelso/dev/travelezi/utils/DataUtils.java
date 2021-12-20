@@ -3,9 +3,12 @@ package cm.intelso.dev.travelezi.utils;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Looper;
+import android.util.DisplayMetrics;
 import android.widget.Spinner;
 
 import androidx.annotation.RequiresApi;
@@ -26,11 +29,18 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import cm.intelso.dev.travelezi.R;
 import cm.intelso.dev.travelezi.json.JsonController;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 
 /**
  * Created by JAFOJIAL on 01/07/2016.
@@ -168,6 +178,15 @@ public class DataUtils {
     }
 
 
+    public static void setLocale(Context ctx, String lang) {
+        Resources res = ctx.getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = new Locale(lang);
+        res.updateConfiguration(conf, dm);
+    }
+
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static PublicKey getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         String rsaPublicKey = pubKey;
@@ -177,6 +196,45 @@ public class DataUtils {
         KeyFactory kf = KeyFactory.getInstance("RSA");
         PublicKey publicKey = kf.generatePublic(keySpec);
         return publicKey;
+    }
+
+    public static String isUserOrDriver(String tkn){
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Jws<Claims> jws = Jwts.parserBuilder().setSigningKey(DataUtils.getPublicKey()).build().parseClaimsJws(tkn);
+                if(jws.getBody().getExpiration().after(new Date())){
+                    String roles = Objects.requireNonNull(jws.getBody().get("roles")).toString();
+                    if(roles.contains("ROLE_DRIVER")){
+                        // Driver
+                        return "DRIVER";
+                    } else if(roles.equals("[ROLE_USER]")){
+                        // Passenger
+                        return "USER";
+                    }
+                }
+            }
+        } catch (JwtException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            //don't trust the JWT!
+//            Log.i(TAG, "JWT TOKEN EXCEPTION : " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    public static String getConnectedEmail(String tkn){
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Jws<Claims> jws = Jwts.parserBuilder().setSigningKey(DataUtils.getPublicKey()).build().parseClaimsJws(tkn);
+                if(jws.getBody().getExpiration().after(new Date())){
+                    return Objects.requireNonNull(jws.getBody().get("username")).toString();
+                }
+            }
+        } catch (JwtException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            //don't trust the JWT!
+//            Log.i(TAG, "JWT TOKEN EXCEPTION : " + e.getMessage());
+        }
+
+        return null;
     }
 
     public static ProgressDialog createProgressDialog(Context ctx){

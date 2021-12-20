@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/bg_gradient">
+    <PreferenceCategory
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:title="@string/general">
+        <EditTextPreference
+            android:dialogTitle="@string/url"
+            android:editable="true"
+            android:key="DEFAULT_URL"
+            android:summary="@string/url_summary"
+            android:title="@string/url" />
+        <EditTextPreference
+            android:dialogTitle="@string/wicket_number"
+            android:key="WICKET_NUMBER"
+            android:summary="@string/wicket_number_summary"
+            android:title="@string/wicket_number" />
+        <ListPreference
+            android:defaultValue="DEFAULT"
+            android:dialogTitle="@string/language"
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            android:key="LANGUAGE"
+            android:summary="@string/language_summary"
+            android:title="@string/language"></ListPreference>
+    </PreferenceCategory>
+</PreferenceScreen>

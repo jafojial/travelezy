@@ -19,6 +19,8 @@ public class SharedPrefs {
     public final String PREFS_USER_TOKEN_KEY = "__TOKEN__" ;
     public final String PREFS_USER_CURRENT_STOP_KEY = "__CURRENT_STOP__" ;
     public final String PREFS_USER_NEXT_STOP_KEY = "__NEXT_STOP__" ;
+    public final String PREFS_USER_FAV_LINES_KEY = "__FAV_LINES__" ;
+    public final String PREFS_USER_FAV_STOPS_KEY = "__FAV_STOPS__" ;
     public final String PREFS_AGENT_ID_KEY = "__AGENT_ID__" ;
     public final String PREFS_AGENT_LOGIN_KEY = "__AGENT_LOGIN__" ;
     public final String PREFS_AGENT_COMPLETE_NAME_KEY = "__AGENT_COMPLETE_NAME__" ;

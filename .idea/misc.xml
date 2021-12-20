@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/drawable-xhdpi/ic_star_24_ok.xml" value="0.3828125" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/drawable/bg_gradient.xml" value="0.3828125" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/drawable/btn_bg.xml" value="0.3" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/drawable/btn_blue_bg_buttom.xml" value="0.21770833333333334" />
@@ -25,11 +26,15 @@
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout-v23/fragment_search_bus_rides.xml" value="0.35280797101449274" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout-v23/fragment_search_bus_stops.xml" value="0.35280797101449274" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout-v23/list_ride_item_layout.xml" value="0.33" />
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout-v23/list_start_item_layout.xml" value="0.19791666666666666" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout-v23/list_stop_item_layout.xml" value="0.3645833333333333" />
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout-w936dp/fragment_planning.xml" value="0.25580601092896177" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/activity_login.xml" value="0.33" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/activity_settings.xml" value="0.18333333333333332" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/activity_splash_screen.xml" value="0.3197463768115942" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/content_login.xml" value="0.21354166666666666" />
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_add_favorite.xml" value="0.17916666666666667" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_aller_simple.xml" value="0.20520833333333333" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_bus_line.xml" value="0.31022530329289427" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_data_list.xml" value="0.36666666666666664" />
@@ -42,13 +47,19 @@
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_one_way_bus.xml" value="0.36666666666666664" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_one_way_ticket.xml" value="0.20520833333333333" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_passenger_infos.xml" value="0.19610507246376813" />
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_planning.xml" value="0.2545289855072464" />
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_planning_starts.xml" value="0.3211050724637681" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_travel_type.xml" value="0.20520833333333333" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/fragment_two_way_ticket.xml" value="0.2838541666666667" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/list_fav_ride_item_layout.xml" value="0.19791666666666666" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/list_fav_stop_item_layout.xml" value="0.33" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/list_line_item_layout.xml" value="0.33" />
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/list_planning_item_layout.xml" value="0.32653985507246375" />
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/layout/list_start_item_layout.xml" value="0.19791666666666666" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/menu/menu_home.xml" value="0.36666666666666664" />
         <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/menu/menu_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/xml/pref_settings.xml" value="0.18333333333333332" />
+        <entry key="..\:/J/JPRO/AndroidStudioProjects/Travelezi/app/src/main/res/xml/root_preferences.xml" value="0.16927083333333334" />
       </map>
     </option>
   </component>

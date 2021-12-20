@@ -94,7 +94,7 @@ public class HistRideFragment extends Fragment {
 
         ArrayList<RideItem> ridesDetails = getListRides();
 
-        listLastRides = (RecyclerView) view.findViewById(R.id.hist_rides_list);
+        listLastRides = (RecyclerView) view.findViewById(R.id.planning_list);
 
         RideListAdapter rideAdapter = new RideListAdapter(this.getContext(), ridesDetails, new RideListAdapter.OnItemClickListener(){
             @Override public void onItemClick(RideItem item) {

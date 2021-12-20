@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -28,7 +29,8 @@ public class RetrofitClient {
     private RetrofitClient(String token) {
 
         Gson gson = new GsonBuilder()
-                .setDateFormat("dd-MM-yyyy'T'HH:mm:ss")
+//                .setDateFormat("dd-MM-yyyy'T'HH:mm:ss")
+                .setDateFormat("dd-MM-yyyy")
                 .create();
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL)
@@ -77,7 +79,10 @@ public class RetrofitClient {
             // Create an ssl socket factory with our all-trusting manager
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
-            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                    .connectTimeout(1, TimeUnit.MINUTES)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(15, TimeUnit.SECONDS);
             builder.sslSocketFactory(sslSocketFactory);
             builder.hostnameVerifier(new HostnameVerifier() {
                 @Override

@@ -13,13 +13,18 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import cm.intelso.dev.travelezi.data.model.SharedPrefs;
+import cm.intelso.dev.travelezi.utils.DataUtils;
+
 public class MainActivity extends AppCompatActivity implements MainFragment.OnFragmentInteractionListener, SearchBusLinesFragment.OnFragmentInteractionListener
         , SearchBusStopsFragment.OnFragmentInteractionListener, SearchBusRidesFragment.OnFragmentInteractionListener, BusLineFragment.OnFragmentInteractionListener
         , BusStopFragment.OnFragmentInteractionListener, NearBusFragment.OnFragmentInteractionListener, FavStopFragment.OnFragmentInteractionListener
     , FavRideFragment.OnFragmentInteractionListener, HistRideFragment.OnFragmentInteractionListener, HistStopFragment.OnFragmentInteractionListener
+    , PreferencesFragment.OnFragmentInteractionListener, PlanningFragment.OnFragmentInteractionListener, PlanningStartsFragment.OnFragmentInteractionListener
 {
 
     private long pressedTime;
+    private SharedPrefs settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +33,23 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFr
         setContentView(R.layout.activity_main);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        settings = new SharedPrefs();
 
         if (savedInstanceState == null) {
 //            switchFragment(new TravelTypeFragment());
-            switchFragment(new NearBusFragment());
+            String tkn = settings.getStringValue(getApplicationContext(), settings.PREFS_USER_TOKEN_KEY);
+            if(tkn != null && !tkn.isEmpty()) {
+                String role = DataUtils.isUserOrDriver(tkn);
+                if (role != null){
+                    if(role == "DRIVER"){
+                        switchFragment(new PlanningFragment());
+                    } else if(role == "USER") {
+                        switchFragment(new NearBusFragment());
+                    }
+                } else{
+                    // Exit app and ask credentials
+                }
+            }
         }
     }
 
@@ -66,6 +84,10 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFr
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+//            Intent setting = new Intent(this, SettingsActivity.class);
+//            setting.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(setting);
+            switchFragment(new PreferencesFragment());
             return true;
         } else if (id == R.id.action_home) {
             switchFragment(new NearBusFragment());

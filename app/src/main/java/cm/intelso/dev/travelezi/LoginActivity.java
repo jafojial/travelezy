@@ -24,7 +24,7 @@ import java.util.Objects;
 import cm.intelso.dev.travelezi.apiclient.RetrofitClient;
 import cm.intelso.dev.travelezi.data.model.SharedPrefs;
 import cm.intelso.dev.travelezi.dto.AuthToken;
-import cm.intelso.dev.travelezi.dto.User;
+import cm.intelso.dev.travelezi.data.model.User;
 import cm.intelso.dev.travelezi.utils.DataUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -117,20 +117,28 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                     Jws<Claims> jws = Jwts.parserBuilder().setSigningKey(DataUtils.getPublicKey()).build().parseClaimsJws(tkn);
-                    if(jws.getBody().getExpiration().after(new Date())){
+                    Log.i(TAG, "JWT TOKEN : " + jws);
+                    if(jws.getBody().getExpiration().after(new Date()) && jws.getBody().get("username").equals(username)){
                         // hide the progress bar
 //                        progressbar.setVisibility(View.GONE);
                         DataUtils.hideProgressDialog(pDialog);
                         String roles = Objects.requireNonNull(jws.getBody().get("roles")).toString();
                         startActivityByRole(roles);
                     }
+                    else{
+                        requestAuthToken(username, pwd);
+                    }
                 }
             } catch (JwtException | NoSuchAlgorithmException | InvalidKeySpecException e) {
                 //don't trust the JWT!
                 Log.i(TAG, "JWT TOKEN EXCEPTION : " + e.getMessage());
             }
+        } else {
+            requestAuthToken(username, pwd);
         }
+    }
 
+    public void requestAuthToken(String username, String pwd){
         Call<AuthToken> call = RetrofitClient.getInstance(null).getMyApi().requestAuthToken(new User(username, pwd));
         call.enqueue(new Callback<AuthToken>() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -165,8 +173,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     // if sign-in is successful
                     startActivityByRole(roles);
-                }
-                else {
+                } else {
 
                     // sign-in failed
                     Toast.makeText(getApplicationContext(), "Login failed!!", Toast.LENGTH_LONG).show();

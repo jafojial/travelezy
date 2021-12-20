@@ -80,4 +80,16 @@
     <string name="login_failed">Connexion échouée</string>
     <string name="next">Suivant</string>
     <string name="previous">Précédent</string>
+    <string name="general">General</string>
+    <string name="url">URL</string>
+    <string name="url_summary">URL Summary</string>
+    <string name="wicket_number">Wicket Number</string>
+    <string name="wicket_number_summary">Wicket Number Summary</string>
+    <string name="language">Language</string>
+    <string name="language_summary">Language Summary</string>
+    <string name="btn_save">Valider</string>
+    <string name="add_fav_title">Ajouter aux favoris</string>
+    <string name="add_fav">Ajouter aux favoris</string>
+    <string name="your_planning">Your Planning</string>
+    <string name="period">00:00 - 00:00</string>
 </resources>
